@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSLE English AL Calculator — Mrs Aw</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1E2345;
+    --navy-mid: #2D3366;
+    --crimson: #B22234;
+    --gold: #C9913A;
+    --gold-tint: #F5E6C8;
+    --warm-white: #F7F5F0;
+    --sand: #EDE9E0;
+    --stone: #C8C4BB;
+    --charcoal: #5C5850;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--warm-white);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--navy);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header .brand { font-family: 'Playfair Display', serif; color: #fff; font-size: 1.1rem; line-height: 1.3; }
+  header .brand span { display: block; font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 2px; }
+  header .badge { background: var(--gold-tint); color: var(--navy); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
+
+  main { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  .page-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; color: var(--navy); margin-bottom: 0.25rem; }
+  .page-sub { font-size: 0.875rem; color: var(--charcoal); margin-bottom: 2rem; }
+
+  .card { background: #fff; border-radius: 14px; border: 1px solid var(--sand); padding: 1.5rem; margin-bottom: 1rem; }
+  .card-title { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.25rem; }
+
+  .component-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+  .comp-name { font-size: 0.875rem; color: var(--navy); width: 190px; min-width: 190px; flex-shrink: 0; }
+  .comp-max { font-size: 0.75rem; color: var(--stone); }
+  .slider-wrap { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .slider-wrap input[type=range] { min-width: 0; width: 100%; }
+
+  input[type=range] { -webkit-appearance: none; flex: 1; height: 4px; background: var(--sand); border-radius: 2px; outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--navy); cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--navy); }
+  input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--navy); cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--navy); }
+
+  .score-badge { min-width: 36px; text-align: right; font-size: 1rem; font-weight: 600; color: var(--navy); }
+
+  .divider { border: none; border-top: 1px solid var(--sand); margin: 1.5rem 0; }
+
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+  .metric { background: var(--warm-white); border-radius: 10px; padding: 1rem; text-align: center; }
+  .metric-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--charcoal); margin-bottom: 6px; }
+  .metric-val { font-size: 2rem; font-weight: 600; color: var(--navy); line-height: 1; }
+  .metric-val.al { color: var(--crimson); }
+  .metric-sub { font-size: 0.7rem; color: var(--stone); margin-top: 3px; }
+
+  .al-band { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .al-pill { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: 1.5px solid var(--sand); color: var(--stone); background: #fff; transition: all 0.2s; }
+  .al-pill.active-1 { background: var(--navy); color: var(--gold); border-color: var(--navy); }
+  .al-pill.active-2 { background: var(--navy-mid); color: #fff; border-color: var(--navy-mid); }
+  .al-pill.active-3 { background: #3a4080; color: #fff; border-color: #3a4080; }
+  .al-pill.active-4 { background: #4d549a; color: #fff; border-color: #4d549a; }
+  .al-pill.active-5 { background: #6b6ea8; color: #fff; border-color: #6b6ea8; }
+  .al-pill.active-6 { background: #8e91bf; color: var(--navy); border-color: #8e91bf; }
+  .al-pill.active-7 { background: #b5b8d6; color: var(--navy); border-color: #b5b8d6; }
+  .al-pill.active-8 { background: #dcddf0; color: var(--navy); border-color: #dcddf0; }
+
+  /* Bar chart */
+  .chart-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { font-size: 0.78rem; color: var(--charcoal); min-width: 155px; flex-shrink: 0; }
+  .bar-track { flex: 1; background: var(--sand); border-radius: 4px; height: 22px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+  .bar-pct { font-size: 0.7rem; font-weight: 600; color: #fff; }
+  .bar-score { font-size: 0.78rem; font-weight: 600; color: var(--navy); min-width: 48px; text-align: right; }
+
+  /* Priority flag */
+  .priority-list { display: flex; flex-direction: column; gap: 8px; }
+  .priority-item { display: flex; align-items: center; gap: 12px; background: var(--warm-white); border-radius: 10px; padding: 10px 14px; }
+  .priority-rank { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: flex-start; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; padding-left: 2px; }
+  .rank-1 { background: var(--crimson); color: #fff; justify-content: center; }
+  .rank-2 { background: var(--navy-mid); color: #fff; justify-content: center; }
+  .rank-3 { background: #6b6ea8; color: #fff; justify-content: center; }
+  .rank-rest { background: var(--sand); color: var(--charcoal); justify-content: center; }
+  .priority-info { flex: 1; }
+  .priority-name { font-size: 0.85rem; font-weight: 600; color: var(--navy); }
+  .priority-reason { font-size: 0.75rem; color: var(--charcoal); margin-top: 2px; }
+  .priority-gain { font-size: 0.75rem; font-weight: 600; color: var(--crimson); background: #fdecea; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .maxed-tag { font-size: 0.72rem; color: var(--stone); background: var(--sand); padding: 2px 8px; border-radius: 10px; }
+
+  /* Diagnosis */
+  .diagnosis-box { background: var(--navy); color: #fff; border-radius: 12px; padding: 1.25rem 1.5rem; }
+  .diagnosis-box .label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .diagnosis-box p { font-size: 0.88rem; line-height: 1.7; color: #e8e8f0; }
+  .diagnosis-box strong { color: #fff; }
+
+  /* What-if nudge */
+  .nudge-box { background: var(--warm-white); border-radius: 10px; padding: 1rem 1.25rem; border-left: 3px solid var(--crimson); }
+  .nudge-title { font-size: 0.8rem; font-weight: 600; color: var(--crimson); margin-bottom: 10px; }
+  .nudge-item { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; color: var(--charcoal); padding: 4px 0; border-bottom: 1px solid var(--sand); }
+  .nudge-item:last-child { border-bottom: none; }
+  .nudge-avail { font-weight: 600; color: var(--navy); }
+  .nudge-maxed { font-size: 0.75rem; color: var(--stone); }
+
+  .al1-msg { background: var(--gold-tint); border: 1.5px solid var(--gold); border-radius: 10px; padding: 1rem 1.25rem; font-size: 0.9rem; font-weight: 600; color: var(--navy); }
+
+  /* Ref table */
+  .ref-toggle { font-size: 0.75rem; color: var(--charcoal); cursor: pointer; background: none; border: none; padding: 0; display: flex; align-items: center; gap: 4px; margin-bottom: 0.75rem; }
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .ref-table th { background: var(--navy); color: var(--gold); padding: 6px 12px; text-align: left; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .ref-table td { padding: 6px 12px; border-bottom: 1px solid var(--sand); color: var(--charcoal); }
+  .ref-table tr:nth-child(even) td { background: var(--warm-white); }
+  .ref-table td:first-child { font-weight: 600; color: var(--navy); }
+
+  footer { text-align: center; padding: 1.5rem; font-size: 0.75rem; color: var(--stone); }
+  footer a { color: var(--gold); text-decoration: none; }
+
+  @media (max-width: 480px) {
+    .result-grid { grid-template-columns: 1fr 1fr; }
+    .metric-val { font-size: 1.5rem; }
+    .comp-name { min-width: 120px; font-size: 0.78rem; }
+    .bar-label { min-width: 110px; font-size: 0.72rem; }
+    header { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>Achieving Excellence in English</span>
+    Mrs Aw
+  </div>
+  <div class="badge">PSLE Tool</div>
+</header>
+
+<main>
+  <h1 class="page-title">AL Grade Calculator</h1>
+  <p class="page-sub">Key in your child's marks for each component — and get a personalised breakdown of where to focus next.</p>
+
+  <!-- Sliders -->
+  <div class="card">
+    <p class="card-title">Component marks</p>
+    <div id="components"></div>
+  </div>
+
+  <!-- Result -->
+  <div class="card">
+    <p class="card-title">Overall result</p>
+    <div class="result-grid">
+      <div class="metric">
+        <p class="metric-label">Total</p>
+        <p class="metric-val" id="total-score">0</p>
+        <p class="metric-sub">out of 200</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">Score /100</p>
+        <p class="metric-val" id="score100">0</p>
+        <p class="metric-sub">scaled</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">AL Grade</p>
+        <p class="metric-val al" id="al-grade">—</p>
+        <p class="metric-sub">English</p>
+      </div>
+    </div>
+
+    <div class="al-band">
+      <span class="al-pill" id="pill-al1">AL1</span>
+      <span class="al-pill" id="pill-al2">AL2</span>
+      <span class="al-pill" id="pill-al3">AL3</span>
+      <span class="al-pill" id="pill-al4">AL4</span>
+      <span class="al-pill" id="pill-al5">AL5</span>
+      <span class="al-pill" id="pill-al6">AL6</span>
+      <span class="al-pill" id="pill-al7">AL7</span>
+      <span class="al-pill" id="pill-al8">AL8</span>
+    </div>
+  </div>
+
+  <!-- Bar chart -->
+  <div class="card">
+    <p class="card-title">Component breakdown</p>
+    <div class="chart-wrap" id="bar-chart"></div>
+  </div>
+
+  <!-- Diagnosis -->
+  <div class="card">
+    <p class="card-title">Mrs Aw's diagnosis</p>
+    <div class="diagnosis-box" id="diagnosis">
+      <p class="label">Reading your results</p>
+      <p id="diagnosis-text" style="color:#a0a0b8;">Move the sliders above to see your personalised diagnosis.</p>
+    </div>
+  </div>
+
+  <!-- Priority -->
+  <div class="card">
+    <p class="card-title">Where to focus — priority order</p>
+    <div class="priority-list" id="priority-list"></div>
+  </div>
+
+  <!-- What-if nudge -->
+  <div class="card">
+    <p class="card-title">What you need for the next AL</p>
+    <div id="nudge-area"></div>
+  </div>
+
+  <!-- Reference -->
+  <div class="card">
+    <button class="ref-toggle" onclick="document.getElementById('ref').toggleAttribute('hidden')">▸ AL boundaries reference (English)</button>
+    <div id="ref" hidden>
+      <table class="ref-table">
+        <thead><tr><th>AL</th><th>Raw mark range (out of 100)</th></tr></thead>
+        <tbody>
+          <tr><td>AL1</td><td>≥ 90</td></tr>
+          <tr><td>AL2</td><td>85 – 89</td></tr>
+          <tr><td>AL3</td><td>80 – 84</td></tr>
+          <tr><td>AL4</td><td>75 – 79</td></tr>
+          <tr><td>AL5</td><td>65 – 74</td></tr>
+          <tr><td>AL6</td><td>45 – 64</td></tr>
+          <tr><td>AL7</td><td>20 – 44</td></tr>
+          <tr><td>AL8</td><td>&lt; 20</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Built for students of <a href="https://www.instagram.com/mrsawqiqi" target="_blank">@mrsawqiqi</a>
+</footer>
+
+<script>
+const components = [
+  { key: 'lc',   name: 'Listening comprehension', short: 'Listening', max: 20 },
+  { key: 'oral', name: 'Oral',                    short: 'Oral',      max: 40 },
+  { key: 'sw',   name: 'Situational writing',     short: 'Sit. Writing', max: 14 },
+  { key: 'comp', name: 'Composition',             short: 'Composition', max: 36 },
+  { key: 'p2',   name: 'Paper 2',                 short: 'Paper 2',   max: 90 },
+];
+
+const TOTAL_MAX = 200;
+
+const AL_BANDS = [
+  { al: 1, min: 90 },
+  { al: 2, min: 85 },
+  { al: 3, min: 80 },
+  { al: 4, min: 75 },
+  { al: 5, min: 65 },
+  { al: 6, min: 45 },
+  { al: 7, min: 20 },
+  { al: 8, min: 0  },
+];
+
+const BAR_COLORS = ['#B22234','#2D3366','#C9913A','#3a4080','#6b6ea8'];
+
+function getAL(s) {
+  for (const b of AL_BANDS) { if (s >= b.min) return b.al; }
+  return 8;
+}
+
+const state = {};
+components.forEach(c => state[c.key] = 0);
+
+// Build sliders
+const container = document.getElementById('components');
+components.forEach(c => {
+  const row = document.createElement('div');
+  row.className = 'component-row';
+  row.innerHTML = `
+    <span class="comp-name">${c.name} <span class="comp-max">/ ${c.max}</span></span>
+    <div class="slider-wrap">
+      <input type="range" min="0" max="${c.max}" value="0" step="1" id="slider-${c.key}">
+      <span class="score-badge" id="badge-${c.key}">0</span>
+    </div>
+  `;
+  container.appendChild(row);
+  document.getElementById(`slider-${c.key}`).addEventListener('input', function() {
+    state[c.key] = parseInt(this.value);
+    document.getElementById(`badge-${c.key}`).textContent = this.value;
+    update();
+  });
+});
+
+// Build bar chart rows
+const chartWrap = document.getElementById('bar-chart');
+components.forEach((c, i) => {
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <span class="bar-label">${c.short}</span>
+    <div class="bar-track">
+      <div class="bar-fill" id="bar-${c.key}" style="width:0%;background:${BAR_COLORS[i]}">
+        <span class="bar-pct" id="barpct-${c.key}"></span>
+      </div>
+    </div>
+    <span class="bar-score" id="barscore-${c.key}">0 / ${c.max}</span>
+  `;
+  chartWrap.appendChild(row);
+});
+
+function getPriority(compList, stateObj) {
+  return compList
+    .map(c => {
+      const gap = c.max - stateObj[c.key];
+      const pct = stateObj[c.key] / c.max;
+      const weight = c.max / TOTAL_MAX;
+      const score = gap * weight * (1 - pct);
+      return { ...c, gap, pct, score };
+    })
+    .sort((a, b) => b.score - a.score);
+}
+
+function getDiagnosis(total, s100, al, stateObj) {
+  const sorted = getPriority(components, stateObj);
+  const top = sorted[0];
+  const lowest = [...components].sort((a,b) => (stateObj[a.key]/a.max) - (stateObj[b.key]/b.max))[0];
+  const lowestPct = Math.round(stateObj[lowest.key] / lowest.max * 100);
+  const topPct = Math.round(stateObj[top.key] / top.max * 100);
+
+  if (total === 0) return 'Move the sliders above to see your personalised diagnosis.';
+
+  if (al === 1) {
+    return `<strong>Outstanding performance — AL1!</strong> Your child is performing at the highest level across the board. The key now is consistency under exam conditions. Keep practising timed responses for oral and composition to maintain this standard.`;
+  }
+
+  const alTarget = al - 1;
+  const targetMin = AL_BANDS.find(b => b.al === alTarget).min;
+  const targetTotal = Math.ceil(targetMin / 100 * TOTAL_MAX);
+  const needed = targetTotal - total;
+
+  let msg = `Your child is currently at <strong>AL${al}</strong>, scoring <strong>${s100}/100</strong>. `;
+
+  if (top.gap === 0) {
+    msg += `All components are maxed out — incredible work! `;
+  } else {
+    msg += `The biggest opportunity is in <strong>${top.name}</strong>, which has ${top.gap} marks still available. `;
+  }
+
+  if (lowestPct < 60) {
+    msg += `<strong>${lowest.name}</strong> is currently the weakest area at ${lowestPct}% — this is worth prioritising in revision. `;
+  }
+
+  msg += `To reach <strong>AL${alTarget}</strong>, just <strong>${needed} more mark${needed !== 1 ? 's' : ''}</strong> are needed across any combination of components. `;
+
+  if (al >= 5) {
+    msg += `Focus on Paper 2 and Oral first — together they make up 65% of the total marks.`;
+  } else {
+    msg += `At this level, fine-tuning composition and situational writing can make the difference.`;
+  }
+
+  return msg;
+}
+
+function update() {
+  const total = components.reduce((s, c) => s + state[c.key], 0);
+  const s100 = Math.round(total / TOTAL_MAX * 100);
+  const al = getAL(s100);
+
+  // Result
+  document.getElementById('total-score').textContent = total;
+  document.getElementById('score100').textContent = s100;
+  document.getElementById('al-grade').textContent = al > 0 ? 'AL' + al : '—';
+
+  // AL pills
+  AL_BANDS.forEach(b => {
+    const pill = document.getElementById(`pill-al${b.al}`);
+    pill.className = 'al-pill' + (b.al === al ? ` active-${b.al}` : '');
+  });
+
+  // Bar chart
+  components.forEach(c => {
+    const pct = Math.round(state[c.key] / c.max * 100);
+    document.getElementById(`bar-${c.key}`).style.width = pct + '%';
+    document.getElementById(`barpct-${c.key}`).textContent = pct > 15 ? pct + '%' : '';
+    document.getElementById(`barscore-${c.key}`).textContent = `${state[c.key]} / ${c.max}`;
+  });
+
+  // Diagnosis
+  document.getElementById('diagnosis-text').innerHTML = getDiagnosis(total, s100, al, state);
+
+  // Priority list
+  const sorted = getPriority(components, state);
+  const pl = document.getElementById('priority-list');
+  pl.innerHTML = '';
+  sorted.forEach((c, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-rest';
+    const pctDone = Math.round(state[c.key] / c.max * 100);
+    const reason = c.gap === 0
+      ? 'Fully scored — great work!'
+      : `${pctDone}% scored — ${c.gap} marks still available`;
+    const tag = c.gap === 0
+      ? `<span class="maxed-tag">maxed out</span>`
+      : `<span class="priority-gain">+${c.gap} marks available</span>`;
+    pl.innerHTML += `
+      <div class="priority-item">
+        <div class="priority-rank ${rankClass}">${i + 1}</div>
+        <div class="priority-info">
+          <p class="priority-name">${c.name} <span style="font-weight:400;color:var(--stone);font-size:0.75rem;">/ ${c.max} marks</span></p>
+          <p class="priority-reason">${reason}</p>
+        </div>
+        ${tag}
+      </div>`;
+  });
+
+  // What-if nudge
+  const area = document.getElementById('nudge-area');
+  if (al === 1) {
+    area.innerHTML = `<div class="al1-msg">Your child is at AL1 — the highest grade. Keep this up!</div>`;
+    return;
+  }
+  const targetAL = al - 1;
+  const targetMin = AL_BANDS.find(b => b.al === targetAL).min;
+  const targetTotal = Math.ceil(targetMin / 100 * TOTAL_MAX);
+  const needed = targetTotal - total;
+
+  let html = `<div class="nudge-box">
+    <p class="nudge-title">Need ${needed} more mark${needed !== 1 ? 's' : ''} to reach AL${targetAL} — any combination below works</p>`;
+  components.forEach(c => {
+    const gap = c.max - state[c.key];
+    html += `<div class="nudge-item">
+      <span>${c.name}</span>
+      ${gap > 0 ? `<span class="nudge-avail">+${gap} available</span>` : `<span class="nudge-maxed">maxed out</span>`}
+    </div>`;
+  });
+  html += `</div>`;
+  area.innerHTML = html;
+}
+
+update();
+</script>
+</body>
+</html>
